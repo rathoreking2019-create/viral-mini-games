@@ -6,7 +6,211 @@ document.addEventListener("DOMContentLoaded", () => {
  restart.addEventListener("click",start);
  function reaction(){let state="idle",timer=0,startAt=0,results=[];const b=document.createElement("button");b.className="reaction-pad";b.textContent="Tap to start";area.append(b);
  const handler=()=>{if(state==="idle"){state="wait";b.classList.add("waiting");b.textContent="Wait for green…";timer=setTimeout(()=>{state="go";startAt=performance.now();b.className="reaction-pad go";b.textContent="TAP NOW!";},900+Math.random()*2800);}else if(state==="wait"){clearTimeout(timer);state="idle";b.className="reaction-pad";b.textContent="Too soon! Tap to try again";setNote("False start — wait until the screen turns green.");}else if(state==="go"){const ms=Math.round(performance.now()-startAt);results.push(ms);state="idle";b.className="reaction-pad";b.textContent=ms+" ms — play again";setScore(ms+" ms");setNote("Best: "+Math.min(...results)+" ms · Average: "+Math.round(results.reduce((a,c)=>a+c,0)/results.length)+" ms");}};b.addEventListener("click",handler);cleanup=()=>{clearTimeout(timer);b.removeEventListener("click",handler);};}
- function merge(){let board=Array(16).fill(0),score=0;const wrap=document.createElement("div");wrap.className="tile-board";area.append(wrap);const render=()=>{wrap.innerHTML="";board.forEach(v=>{const d=document.createElement("div");d.className="tile "+(v>=128?"big":v?"v"+v:"");d.textContent=v||"";wrap.append(d);});setScore(score);};const add=()=>{let empty=board.map((v,i)=>v===0?i:-1).filter(i=>i>=0);if(empty.length)board[empty[Math.floor(Math.random()*empty.length)]]=Math.random()<.9?2:4;};add();add();render();
+
+function merge() {
+  let board = Array(16).fill(0);
+  let score = 0;
+  let gameOver = false;
+  let won = false;
+
+  const wrap = document.createElement("div");
+  wrap.className = "tile-board";
+  area.append(wrap);
+
+  // Create the 16 tiles once. Reuse them on every move.
+  const cells = [];
+
+  for (let i = 0; i < 16; i++) {
+    const tile = document.createElement("div");
+    tile.className = "tile";
+    tile.dataset.index = i;
+    wrap.append(tile);
+    cells.push(tile);
+  }
+
+  const updateTile = (i, value, animation = "") => {
+    const tile = cells[i];
+    const oldValue = Number(tile.dataset.value || 0);
+
+    tile.textContent = value || "";
+    tile.dataset.value = value;
+
+    tile.className =
+      "tile" +
+      (value ? (value >= 128 ? " big" : " v" + value) : "");
+
+    if (animation) {
+      tile.classList.add(animation);
+      tile.addEventListener("animationend", () => {
+        tile.classList.remove(animation);
+      }, { once: true });
+    } else if (value && !oldValue) {
+      tile.classList.add("tile-pop");
+      tile.addEventListener("animationend", () => {
+        tile.classList.remove("tile-pop");
+      }, { once: true });
+    }
+  };
+
+  const render = (merged = []) => {
+    cells.forEach((tile, i) => {
+      updateTile(i, board[i], merged.includes(i) ? "tile-merge" : "");
+    });
+    setScore(score);
+  };
+
+  const addTile = () => {
+    const empty = board
+      .map((value, index) => value === 0 ? index : -1)
+      .filter(index => index !== -1);
+
+    if (!empty.length) return -1;
+
+    const index = empty[Math.floor(Math.random() * empty.length)];
+    board[index] = Math.random() < 0.9 ? 2 : 4;
+
+    return index;
+  };
+
+  const getLine = (direction, line) => {
+    const ids = [];
+
+    for (let j = 0; j < 4; j++) {
+      if (direction === "left") ids.push(line * 4 + j);
+      if (direction === "right") ids.push(line * 4 + 3 - j);
+      if (direction === "up") ids.push(j * 4 + line);
+      if (direction === "down") ids.push((3 - j) * 4 + line);
+    }
+
+    return ids;
+  };
+
+  const calculateMove = (direction, source) => {
+    const result = source.slice();
+    let gained = 0;
+    let changed = false;
+    const merged = [];
+
+    for (let line = 0; line < 4; line++) {
+      const ids = getLine(direction, line);
+      const values = ids.map(i => source[i]).filter(Boolean);
+      const output = [];
+
+      for (let k = 0; k < values.length; k++) {
+        if (values[k] === values[k + 1]) {
+          const value = values[k] * 2;
+          output.push(value);
+          gained += value;
+          k++;
+        } else {
+          output.push(values[k]);
+        }
+      }
+
+      while (output.length < 4) output.push(0);
+
+      ids.forEach((id, k) => {
+        if (result[id] !== output[k]) changed = true;
+        result[id] = output[k];
+
+        // Identify tiles that have just merged.
+        if (output[k] && output[k] > source[id]) {
+          merged.push(id);
+        }
+      });
+    }
+
+    return { result, gained, changed, merged };
+  };
+
+  const canMove = () => {
+    if (board.includes(0)) return true;
+
+    return ["left", "right", "up", "down"].some(direction => {
+      return calculateMove(direction, board).changed;
+    });
+  };
+
+  const move = direction => {
+    if (gameOver) return;
+
+    const result = calculateMove(direction, board);
+
+    if (!result.changed) return;
+
+    board = result.result;
+    score += result.gained;
+
+    const spawnedIndex = addTile();
+
+    render(result.merged);
+
+    if (!won && board.includes(2048)) {
+      won = true;
+      setNote("2048 reached! Amazing! Keep playing or restart.");
+    } else if (spawnedIndex === -1 || !canMove()) {
+      gameOver = true;
+      setNote("Game over! Final score: " + score + ". Press Restart to play again.");
+    }
+  };
+
+  addTile();
+  addTile();
+  render();
+
+  const keyHandler = e => {
+    const directions = {
+      ArrowLeft: "left",
+      ArrowRight: "right",
+      ArrowUp: "up",
+      ArrowDown: "down",
+      a: "left",
+      d: "right",
+      w: "up",
+      s: "down"
+    };
+
+    const direction = directions[e.key];
+
+    if (direction) {
+      e.preventDefault();
+      move(direction);
+    }
+  };
+
+  let startX = 0;
+  let startY = 0;
+
+  const touchStart = e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  };
+
+  const touchEnd = e => {
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 30) return;
+
+    move(
+      Math.abs(dx) > Math.abs(dy)
+        ? (dx > 0 ? "right" : "left")
+        : (dy > 0 ? "down" : "up")
+    );
+  };
+
+  window.addEventListener("keydown", keyHandler);
+  wrap.addEventListener("touchstart", touchStart, { passive: true });
+  wrap.addEventListener("touchend", touchEnd, { passive: true });
+
+  cleanup = () => {
+    window.removeEventListener("keydown", keyHandler);
+    wrap.removeEventListener("touchstart", touchStart);
+    wrap.removeEventListener("touchend", touchEnd);
+  };
+
+  setNote("Use arrow keys, WASD or swipe to move. Merge matching numbers to reach 2048.");
+}
  const move=dir=>{let changed=false;for(let line=0;line<4;line++){let ids=[];for(let j=0;j<4;j++)ids.push(dir==="left"?line*4+j:dir==="right"?line*4+3-j:dir==="up"?j*4+line:(3-j)*4+line);let vals=ids.map(i=>board[i]).filter(Boolean),out=[];for(let k=0;k<vals.length;k++){if(vals[k]===vals[k+1]){out.push(vals[k]*2);score+=vals[k]*2;k++;}else out.push(vals[k]);}while(out.length<4)out.push(0);ids.forEach((id,k)=>{if(board[id]!==out[k])changed=true;board[id]=out[k];});}if(changed){add();render();if(board.includes(2048))setNote("2048 reached! Keep playing or restart.");else if(!canMove())setNote("No more moves. Restart to play again.");}};
  const canMove=()=>board.includes(0)||["left","right","up","down"].some(d=>{let copy=board.slice();let before=score;moveNoSpawn(d);let ok=copy.some((v,i)=>v!==board[i]);board=copy;score=before;return ok;});
  const moveNoSpawn=dir=>{for(let line=0;line<4;line++){let ids=[];for(let j=0;j<4;j++)ids.push(dir==="left"?line*4+j:dir==="right"?line*4+3-j:dir==="up"?j*4+line:(3-j)*4+line);let vals=ids.map(i=>board[i]).filter(Boolean),out=[];for(let k=0;k<vals.length;k++){if(vals[k]===vals[k+1]){out.push(vals[k]*2);k++;}else out.push(vals[k]);}while(out.length<4)out.push(0);ids.forEach((id,k)=>board[id]=out[k]);}};
