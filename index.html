@@ -7,22 +7,32 @@
 
   <title>PlayViral — Free Online Mini Games</title>
 
-  <meta name="description" content="Play free online mini games: reaction speed test, number merge, ball sort, block puzzle and endless runner. No downloads required.">
+  <meta
+    name="description"
+    content="Play free online mini games on PlayViral. Test your reaction speed, solve number and ball sort puzzles, play block puzzle and enjoy endless runner challenges. No downloads required."
+  >
 
-  <meta name="robots" content="index,follow">
-  <meta name="theme-color" content="#f7f7fb">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0b1020">
 
-  <link rel="canonical" href="https://viral-mini-games.rathoreking2016.workers.dev/">
+  <link
+    rel="canonical"
+    href="https://viral-mini-games.rathoreking2016.workers.dev/"
+  >
 
   <meta property="og:title" content="PlayViral — Free Online Mini Games">
-  <meta property="og:description" content="Quick, fun and free browser games. Play instantly on desktop or mobile.">
+  <meta
+    property="og:description"
+    content="Quick, fun and free browser games. Play instantly on desktop or mobile."
+  >
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://viral-mini-games.rathoreking2016.workers.dev/">
+  <meta
+    property="og:url"
+    content="https://viral-mini-games.rathoreking2016.workers.dev/"
+  >
 
-  <!-- Main stylesheet -->
   <link rel="stylesheet" href="./style.css">
 
-  <!-- Main JavaScript -->
   <script defer src="./app.js"></script>
 </head>
 
@@ -30,13 +40,14 @@
 
 <header class="site-header">
 
-  <a class="brand" href="./">
+  <a class="brand" href="/" aria-label="PlayViral Home">
     <span class="brand-mark">▶</span> PlayViral
   </a>
 
-  <nav>
+  <nav aria-label="Main navigation">
     <a href="#games">Games</a>
     <a href="#about">About</a>
+    <a href="/contact.html">Contact</a>
   </nav>
 
 </header>
@@ -120,10 +131,9 @@
 
     </div>
 
-
     <div class="game-grid">
 
-      <!-- GAME 1: REACTION TEST -->
+      <!-- GAME 1 -->
       <a class="game-card" href="./reaction-test.html">
 
         <div class="game-visual visual-reaction">
@@ -136,7 +146,6 @@
             <h3>Reaction Test</h3>
             <p>How fast are your reflexes?</p>
           </div>
-
           <span class="play-icon">↗</span>
         </div>
 
@@ -145,7 +154,7 @@
       </a>
 
 
-      <!-- GAME 2: NUMBER MERGE -->
+      <!-- GAME 2 -->
       <a class="game-card" href="./number-merge.html">
 
         <div class="game-visual visual-number">
@@ -160,7 +169,6 @@
             <h3>Number Merge</h3>
             <p>Combine tiles. Chase 2048.</p>
           </div>
-
           <span class="play-icon">↗</span>
         </div>
 
@@ -169,7 +177,7 @@
       </a>
 
 
-      <!-- GAME 3: BALL SORT -->
+      <!-- GAME 3 -->
       <a class="game-card" href="./ball-sort.html">
 
         <div class="game-visual visual-balls">
@@ -184,7 +192,6 @@
             <h3>Ball Sort</h3>
             <p>Sort every color into a tube.</p>
           </div>
-
           <span class="play-icon">↗</span>
         </div>
 
@@ -193,7 +200,7 @@
       </a>
 
 
-      <!-- GAME 4: BLOCK PUZZLE -->
+      <!-- GAME 4 -->
       <a class="game-card" href="./block-puzzle.html">
 
         <div class="game-visual visual-block">
@@ -211,7 +218,6 @@
             <h3>Block Puzzle</h3>
             <p>Fit blocks and clear lines.</p>
           </div>
-
           <span class="play-icon">↗</span>
         </div>
 
@@ -220,7 +226,7 @@
       </a>
 
 
-      <!-- GAME 5: ENDLESS RUNNER -->
+      <!-- GAME 5 -->
       <a class="game-card" href="./endless-runner.html">
 
         <div class="game-visual visual-runner">
@@ -233,7 +239,6 @@
             <h3>Endless Runner</h3>
             <p>Jump, dodge and keep going.</p>
           </div>
-
           <span class="play-icon">↗</span>
         </div>
 
@@ -258,11 +263,15 @@
       </h2>
     </div>
 
-    <p>
-      PlayViral is a growing collection of simple, free browser games.
-      No app install, no account and no download.
-      Pick a challenge and play.
-    </p>
+    <div>
+      <p>
+        PlayViral is a growing collection of simple,
+        free browser games. No app install, no account
+        and no download. Pick a challenge and play.
+      </p>
+
+      <a href="/about.html">Learn more about PlayViral →</a>
+    </div>
 
   </section>
 
@@ -272,29 +281,29 @@
 <!-- FOOTER -->
 <footer>
 
-  <a class="brand" href="./">
+  <a class="brand" href="/" aria-label="PlayViral Home">
     <span class="brand-mark">▶</span> PlayViral
   </a>
 
-  <div>
-    <a href="./about.html">About</a>
-    <a href="./contact.html">Contact</a>
-    <a href="./privacy.html">Privacy</a>
-    <a href="./terms.html">Terms</a>
-  </div>
+  <nav aria-label="Footer navigation">
+
+    <a href="/about.html">About</a>
+
+    <a href="/contact.html">Contact</a>
+
+    <a href="/privacy.html">Privacy Policy</a>
+
+    <a href="/terms.html">Terms of Use</a>
+
+    <a href="/disclaimer.html">Disclaimer</a>
+
+  </nav>
 
   <small>
     © <span id="year"></span> PlayViral. Built for fun.
   </small>
 
 </footer>
-
-
-<!-- AUTOMATIC COPYRIGHT YEAR -->
-<script>
-  document.getElementById("year").textContent =
-    new Date().getFullYear();
-</script>
 
 </body>
 </html>
