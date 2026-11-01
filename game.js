@@ -212,7 +212,274 @@ function merge() {
   setNote("Use arrow keys, WASD or swipe to move. Merge matching numbers to reach 2048.");
 }
  function balls(){const colors=["red","blue","green","yellow","purple","orange"];let tubes=[];for(let i=0;i<5;i++)tubes.push([]);let all=[];colors.slice(0,4).forEach(c=>{for(let j=0;j<4;j++)all.push(c)});all.sort(()=>Math.random()-.5);for(let i=0;i<4;i++)tubes[i]=all.slice(i*4,i*4+4);let selected=-1,moves=0;const draw=()=>{area.innerHTML="";const row=document.createElement("div");row.className="tubes";tubes.forEach((t,i)=>{const el=document.createElement("button");el.className="tube";el.setAttribute("aria-label","Tube "+(i+1));t.forEach(c=>{const ball=document.createElement("span");ball.className="ball "+c;el.append(ball);});el.addEventListener("click",()=>tap(i));row.append(el);});area.append(row);setScore(moves);};const tap=i=>{if(selected<0){if(tubes[i].length)selected=i;}else if(selected===i)selected=-1;else{let from=tubes[selected],to=tubes[i],c=from[from.length-1];if(c&&to.length<4&&(!to.length||to[to.length-1]===c)){to.push(from.pop());moves++;}selected=-1;}draw();if(tubes.every(t=>!t.length||t.every(c=>c===t[0])&&t.length===4))setNote("Puzzle complete! Great sorting.");};draw();setNote("Tap a tube, then tap another tube. One empty tube helps.");}
- function blocks(){let grid=Array(64).fill(0),score=0,shapes=[[[1,1],[1,1]],[[1,1,1]],[[1],[1],[1]],[[1,1,1],[0,1,0]],[[1,1],[0,1]],[[1],[1],[1],[1]]],current=[];const next=()=>{current=Array.from({length:3},()=>shapes[Math.floor(Math.random()*shapes.length)]);};const draw=()=>{area.innerHTML="";let board=document.createElement("div");board.className="block-board";grid.forEach((v,i)=>{let c=document.createElement("button");c.className="block-cell"+(v?" filled":"");c.setAttribute("aria-label","Cell "+(i+1));c.addEventListener("click",()=>place(i));board.append(c);});area.append(board);let tray=document.createElement("div");tray.style.cssText="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px";current.forEach((s,i)=>{let b=document.createElement("button");b.className="control-btn secondary";b.textContent=s.map(r=>r.map(v=>v?"■":" ").join("")).join(" / ");b.style.fontSize="11px";b.style.maxWidth="100px";b.addEventListener("click",()=>{selected=i;setNote("Selected shape "+(i+1)+". Tap an empty cell.");});tray.append(b);});area.append(tray);setScore(score);};let selected=0;const fits=(shape,r,c)=>shape.every((line,y)=>line.every((v,x)=>!v||(r+y<8&&c+x<8&&!grid[(r+y)*8+c+x])));const place=i=>{let s=current[selected],r=Math.floor(i/8),c=i%8;if(!fits(s,r,c)){setNote("That shape does not fit there.");return;}s.forEach((line,y)=>line.forEach((v,x)=>{if(v)grid[(r+y)*8+c+x]=1;}));let clear=new Set();for(let y=0;y<8;y++)if(grid.slice(y*8,y*8+8).every(Boolean))for(let x=0;x<8;x++)clear.add(y*8+x);for(let x=0;x<8;x++)if(Array.from({length:8},(_,y)=>grid[y*8+x]).every(Boolean))for(let y=0;y<8;y++)clear.add(y*8+x);clear.forEach(i=>grid[i]=0);score+=s.flat().filter(Boolean).length+clear.size*2;current[selected]=shapes[Math.floor(Math.random()*shapes.length)];draw();if(current.every(sh=>!Array.from({length:64},(_,i)=>fits(sh,Math.floor(i/8),i%8)).some(Boolean)))setNote("No available placement. Restart to try again.");};next();draw();setNote("Choose a shape, then tap a board position to place it.");}
+
+function blocks() {
+  const SIZE = 8;
+
+  let grid = Array(SIZE * SIZE).fill(0);
+  let score = 0;
+  let level = 1;
+  let piece = null;
+  let timer = null;
+  let gameOver = false;
+
+  const shapes = [
+    [[1, 1, 1, 1]],
+    [[1, 1], [1, 1]],
+    [[1, 1, 1], [0, 1, 0]],
+    [[1, 1, 1], [1, 0, 0]],
+    [[1, 1, 1], [0, 0, 1]],
+    [[1, 1, 0], [0, 1, 1]],
+    [[0, 1, 1], [1, 1, 0]],
+    [[1, 1, 1], [1, 0, 1]]
+  ];
+
+  const wrap = document.createElement("div");
+  wrap.className = "falling-game";
+
+  const board = document.createElement("div");
+  board.className = "block-board";
+
+  const cells = [];
+
+  for (let i = 0; i < SIZE * SIZE; i++) {
+    const cell = document.createElement("div");
+    cell.className = "block-cell";
+    cells.push(cell);
+    board.append(cell);
+  }
+
+  const controls = document.createElement("div");
+  controls.className = "fall-controls";
+
+  const makeButton = (label, action, title) => {
+    const button = document.createElement("button");
+    button.className = "fall-control";
+    button.textContent = label;
+    button.setAttribute("aria-label", title);
+    button.addEventListener("click", action);
+    controls.append(button);
+    return button;
+  };
+
+  wrap.append(board, controls);
+  area.append(wrap);
+
+  const rotateShape = shape =>
+    shape[0].map((_, i) =>
+      shape.map(row => row[i]).reverse()
+    );
+
+  const valid = (shape, x, y) => {
+    return shape.every((row, dy) =>
+      row.every((value, dx) => {
+        if (!value) return true;
+
+        const nx = x + dx;
+        const ny = y + dy;
+
+        return (
+          nx >= 0 &&
+          nx < SIZE &&
+          ny < SIZE &&
+          !grid[ny * SIZE + nx]
+        );
+      })
+    );
+  };
+
+  const render = () => {
+    const active = new Set();
+
+    if (piece) {
+      piece.shape.forEach((row, dy) =>
+        row.forEach((value, dx) => {
+          if (value) {
+            const x = piece.x + dx;
+            const y = piece.y + dy;
+
+            if (x >= 0 && x < SIZE && y >= 0 && y < SIZE) {
+              active.add(y * SIZE + x);
+            }
+          }
+        })
+      );
+    }
+
+    cells.forEach((cell, i) => {
+      cell.className = "block-cell";
+
+      if (grid[i]) cell.classList.add("filled");
+      if (active.has(i)) cell.classList.add("falling");
+    });
+
+    setScore(score);
+  };
+
+  const spawn = () => {
+    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+
+    piece = {
+      shape: shape.map(row => row.slice()),
+      x: Math.floor((SIZE - shape[0].length) / 2),
+      y: 0
+    };
+
+    if (!valid(piece.shape, piece.x, piece.y)) {
+      endGame();
+      return;
+    }
+
+    render();
+  };
+
+  const lockPiece = () => {
+    piece.shape.forEach((row, dy) =>
+      row.forEach((value, dx) => {
+        if (value) {
+          const x = piece.x + dx;
+          const y = piece.y + dy;
+
+          if (y >= 0 && y < SIZE) {
+            grid[y * SIZE + x] = 1;
+          }
+        }
+      })
+    );
+
+    piece = null;
+
+    // Clear completed horizontal rows.
+    const remaining = [];
+
+    for (let y = 0; y < SIZE; y++) {
+      const row = grid.slice(y * SIZE, (y + 1) * SIZE);
+
+      if (!row.every(Boolean)) {
+        remaining.push(row);
+      } else {
+        score += 100 * level;
+      }
+    }
+
+    while (remaining.length < SIZE) {
+      remaining.unshift(Array(SIZE).fill(0));
+    }
+
+    grid = remaining.flat();
+
+    level = Math.floor(score / 500) + 1;
+
+    if (!gameOver) spawn();
+  };
+
+  const tick = () => {
+    if (gameOver || !piece) return;
+
+    if (valid(piece.shape, piece.x, piece.y + 1)) {
+      piece.y++;
+      render();
+    } else {
+      lockPiece();
+    }
+
+    if (!gameOver) scheduleTick();
+  };
+
+  const scheduleTick = () => {
+    clearTimeout(timer);
+
+    const speed = Math.max(100, 550 - (level - 1) * 45);
+    timer = setTimeout(tick, speed);
+  };
+
+  const move = dx => {
+    if (gameOver || !piece) return;
+
+    if (valid(piece.shape, piece.x + dx, piece.y)) {
+      piece.x += dx;
+      render();
+    }
+  };
+
+  const rotate = () => {
+    if (gameOver || !piece) return;
+
+    const rotated = rotateShape(piece.shape);
+
+    if (valid(rotated, piece.x, piece.y)) {
+      piece.shape = rotated;
+      render();
+    }
+  };
+
+  const softDrop = () => {
+    if (gameOver || !piece) return;
+
+    if (valid(piece.shape, piece.x, piece.y + 1)) {
+      piece.y++;
+      score += 1;
+      render();
+    } else {
+      lockPiece();
+    }
+  };
+
+  const hardDrop = () => {
+    if (gameOver || !piece) return;
+
+    while (valid(piece.shape, piece.x, piece.y + 1)) {
+      piece.y++;
+      score += 2;
+    }
+
+    render();
+    lockPiece();
+
+    if (!gameOver) scheduleTick();
+  };
+
+  const endGame = () => {
+    gameOver = true;
+    clearTimeout(timer);
+    piece = null;
+    render();
+
+    setNote("Game over! Final score: " + score + ". Press Restart to play again.");
+  };
+
+  const keyHandler = e => {
+    if (gameOver) return;
+
+    if (["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", " "].includes(e.key)) {
+      e.preventDefault();
+    }
+
+    if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") move(-1);
+    if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") move(1);
+    if (e.key === "ArrowDown" || e.key.toLowerCase() === "s") softDrop();
+    if (e.key === "ArrowUp" || e.key.toLowerCase() === "w") rotate();
+    if (e.code === "Space") hardDrop();
+  };
+
+  window.addEventListener("keydown", keyHandler);
+
+  makeButton("←", () => move(-1), "Move left");
+  makeButton("↻", rotate, "Rotate piece");
+  makeButton("→", () => move(1), "Move right");
+  makeButton("↓", softDrop, "Move down");
+  makeButton("⬇", hardDrop, "Drop instantly");
+
+  spawn();
+  scheduleTick();
+
+  setNote("Move: ← → | Rotate: ↑ | Drop: ↓ | Hard drop: Space");
+
+  cleanup = () => {
+    clearTimeout(timer);
+    window.removeEventListener("keydown", keyHandler);
+  };
+}
  function runner(){const canvas=document.createElement("canvas");canvas.width=680;canvas.height=300;canvas.className="runner-canvas";area.append(canvas);const ctx=canvas.getContext("2d");let x=80,y=220,vy=0,obs=[],score=0,alive=true,frame=0,raf;const jump=()=>{if(y>=220&&alive)vy=-13;};const key=e=>{if(e.code==="Space"){e.preventDefault();jump();}};window.addEventListener("keydown",key);canvas.addEventListener("pointerdown",jump);function loop(){ctx.clearRect(0,0,680,300);ctx.fillStyle="#d8e8f8";ctx.fillRect(0,250,680,50);ctx.fillStyle="#283b59";ctx.fillRect(0,250,680,3);vy+=.65;y+=vy;if(y>220){y=220;vy=0;}if(frame%85===0)obs.push({x:690,w:24,h:35+Math.random()*25});obs.forEach(o=>o.x-=5);obs=obs.filter(o=>o.x>-30);ctx.fillStyle="#7057f5";ctx.fillRect(x,y,30,30);ctx.fillStyle="#f46b9b";obs.forEach(o=>ctx.fillRect(o.x,250-o.h,o.w,o.h));if(obs.some(o=>x+27>o.x&&x<o.x+o.w&&y+27>250-o.h)){alive=false;}ctx.fillStyle="#17172a";ctx.font="bold 18px sans-serif";ctx.fillText("Distance: "+score,20,30);if(alive){score++;frame++;setScore(Math.floor(score/5));raf=requestAnimationFrame(loop);}else{ctx.fillStyle="#17172a";ctx.font="bold 30px sans-serif";ctx.fillText("Game over!",260,135);setNote("You ran "+Math.floor(score/5)+" metres. Press Restart to run again.");}}loop();cleanup=()=>{cancelAnimationFrame(raf);window.removeEventListener("keydown",key);};setNote("Tap, click or press Space to jump.");}
  start();
 });
