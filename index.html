@@ -1,51 +1,300 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>PlayViral — Free Online Mini Games</title>
+
   <meta name="description" content="Play free online mini games: reaction speed test, number merge, ball sort, block puzzle and endless runner. No downloads required.">
+
   <meta name="robots" content="index,follow">
-  <link rel="canonical" href="https://YOUR-SITE.pages.dev/">
+  <meta name="theme-color" content="#f7f7fb">
+
+  <link rel="canonical" href="https://viral-mini-games.rathoreking2016.workers.dev/">
+
   <meta property="og:title" content="PlayViral — Free Online Mini Games">
   <meta property="og:description" content="Quick, fun and free browser games. Play instantly on desktop or mobile.">
   <meta property="og:type" content="website">
-  <link rel="stylesheet" href="/style.css">
-  <script defer src="assets/app.js"></script>
+  <meta property="og:url" content="https://viral-mini-games.rathoreking2016.workers.dev/">
+
+  <!-- Main stylesheet -->
+  <link rel="stylesheet" href="./style.css">
+
+  <!-- Main JavaScript -->
+  <script defer src="./app.js"></script>
 </head>
+
 <body>
+
 <header class="site-header">
-  <a class="brand" href="./"><span class="brand-mark">▶</span> PlayViral</a>
-  <nav><a href="#games">Games</a><a href="#about">About</a></nav>
+
+  <a class="brand" href="./">
+    <span class="brand-mark">▶</span> PlayViral
+  </a>
+
+  <nav>
+    <a href="#games">Games</a>
+    <a href="#about">About</a>
+  </nav>
+
 </header>
+
 <main>
+
+  <!-- HERO SECTION -->
   <section class="hero">
+
     <div class="hero-copy">
-      <p class="eyebrow">NO DOWNLOADS · PLAY IN YOUR BROWSER</p>
-      <h1>One quick game.<br><span>One more round.</span></h1>
-      <p class="hero-sub">Free mini games for your break. Challenge your brain, test your reflexes and beat your best score.</p>
-      <a class="primary-btn" href="#games">Explore games <span>↘</span></a>
-      <div class="hero-stats"><span><b>5</b> mini games</span><span><b>100%</b> browser based</span><span><b>Free</b> to play</span></div>
+
+      <p class="eyebrow">
+        NO DOWNLOADS · PLAY IN YOUR BROWSER
+      </p>
+
+      <h1>
+        One quick game.<br>
+        <span>One more round.</span>
+      </h1>
+
+      <p class="hero-sub">
+        Free mini games for your break. Challenge your brain,
+        test your reflexes and beat your best score.
+      </p>
+
+      <a class="primary-btn" href="#games">
+        Explore games <span>↘</span>
+      </a>
+
+      <div class="hero-stats">
+        <span><b>5</b> mini games</span>
+        <span><b>100%</b> browser based</span>
+        <span><b>Free</b> to play</span>
+      </div>
+
     </div>
-    <div class="hero-art" aria-label="Decorative game cards">
-      <div class="float-card card-one"><span>⚡</span><b>Reaction</b><small>Beat your time</small></div>
-      <div class="float-card card-two"><span>🔢</span><b>Number Merge</b><small>Reach 2048</small></div>
-      <div class="float-card card-three"><span>🟣</span><b>Ball Sort</b><small>Sort the colors</small></div>
-      <div class="hero-orb">PLAY<br><strong>NOW</strong></div>
+
+    <div class="hero-art" aria-label="Featured games">
+
+      <div class="float-card card-one">
+        <span>⚡</span>
+        <b>Reaction</b>
+        <small>Beat your time</small>
+      </div>
+
+      <div class="float-card card-two">
+        <span>🔢</span>
+        <b>Number Merge</b>
+        <small>Reach 2048</small>
+      </div>
+
+      <div class="float-card card-three">
+        <span>🟣</span>
+        <b>Ball Sort</b>
+        <small>Sort the colors</small>
+      </div>
+
+      <div class="hero-orb">
+        PLAY<br>
+        <strong>NOW</strong>
+      </div>
+
     </div>
+
   </section>
 
+
+  <!-- GAMES SECTION -->
   <section class="section" id="games">
-    <div class="section-heading"><div><p class="eyebrow">PICK YOUR CHALLENGE</p><h2>Choose a game</h2></div><span class="muted">Free · Instant · Mobile friendly</span></div>
-    <div class="game-grid">
-      <a class="game-card" href="games/reaction-test.html"><div class="game-visual visual-reaction">⚡<span>READY?</span></div><div class="game-info"><div><h3>Reaction Test</h3><p>How fast are your reflexes?</p></div><span class="play-icon">↗</span></div><span class="tag">REFLEX</span></a>
-      <a class="game-card" href="games/number-merge.html"><div class="game-visual visual-number"><span>2</span><span>4</span><span>8</span><span>16</span></div><div class="game-info"><div><h3>Number Merge</h3><p>Combine tiles. Chase 2048.</p></div><span class="play-icon">↗</span></div><span class="tag">PUZZLE</span></a>
-      <a class="game-card" href="games/ball-sort.html"><div class="game-visual visual-balls"><i>🟠</i><i>🟣</i><i>🔵</i><i>🟢</i></div><div class="game-info"><div><h3>Ball Sort</h3><p>Sort every color into a tube.</p></div><span class="play-icon">↗</span></div><span class="tag">LOGIC</span></a>
-      <a class="game-card" href="games/block-puzzle.html"><div class="game-visual visual-block"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><div class="game-info"><div><h3>Block Puzzle</h3><p>Fit blocks and clear lines.</p></div><span class="play-icon">↗</span></div><span class="tag">ARCADE</span></a>
-      <a class="game-card" href="games/endless-runner.html"><div class="game-visual visual-runner">🏃<span>•••</span></div><div class="game-info"><div><h3>Endless Runner</h3><p>Jump, dodge and keep going.</p></div><span class="play-icon">↗</span></div><span class="tag">ACTION</span></a>
+
+    <div class="section-heading">
+
+      <div>
+        <p class="eyebrow">PICK YOUR CHALLENGE</p>
+        <h2>Choose a game</h2>
+      </div>
+
+      <span class="muted">
+        Free · Instant · Mobile friendly
+      </span>
+
     </div>
+
+
+    <div class="game-grid">
+
+      <!-- GAME 1: REACTION TEST -->
+      <a class="game-card" href="./reaction-test.html">
+
+        <div class="game-visual visual-reaction">
+          ⚡
+          <span>READY?</span>
+        </div>
+
+        <div class="game-info">
+          <div>
+            <h3>Reaction Test</h3>
+            <p>How fast are your reflexes?</p>
+          </div>
+
+          <span class="play-icon">↗</span>
+        </div>
+
+        <span class="tag">REFLEX</span>
+
+      </a>
+
+
+      <!-- GAME 2: NUMBER MERGE -->
+      <a class="game-card" href="./number-merge.html">
+
+        <div class="game-visual visual-number">
+          <span>2</span>
+          <span>4</span>
+          <span>8</span>
+          <span>16</span>
+        </div>
+
+        <div class="game-info">
+          <div>
+            <h3>Number Merge</h3>
+            <p>Combine tiles. Chase 2048.</p>
+          </div>
+
+          <span class="play-icon">↗</span>
+        </div>
+
+        <span class="tag">PUZZLE</span>
+
+      </a>
+
+
+      <!-- GAME 3: BALL SORT -->
+      <a class="game-card" href="./ball-sort.html">
+
+        <div class="game-visual visual-balls">
+          <i>🟠</i>
+          <i>🟣</i>
+          <i>🔵</i>
+          <i>🟢</i>
+        </div>
+
+        <div class="game-info">
+          <div>
+            <h3>Ball Sort</h3>
+            <p>Sort every color into a tube.</p>
+          </div>
+
+          <span class="play-icon">↗</span>
+        </div>
+
+        <span class="tag">LOGIC</span>
+
+      </a>
+
+
+      <!-- GAME 4: BLOCK PUZZLE -->
+      <a class="game-card" href="./block-puzzle.html">
+
+        <div class="game-visual visual-block">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <div class="game-info">
+          <div>
+            <h3>Block Puzzle</h3>
+            <p>Fit blocks and clear lines.</p>
+          </div>
+
+          <span class="play-icon">↗</span>
+        </div>
+
+        <span class="tag">ARCADE</span>
+
+      </a>
+
+
+      <!-- GAME 5: ENDLESS RUNNER -->
+      <a class="game-card" href="./endless-runner.html">
+
+        <div class="game-visual visual-runner">
+          🏃
+          <span>•••</span>
+        </div>
+
+        <div class="game-info">
+          <div>
+            <h3>Endless Runner</h3>
+            <p>Jump, dodge and keep going.</p>
+          </div>
+
+          <span class="play-icon">↗</span>
+        </div>
+
+        <span class="tag">ACTION</span>
+
+      </a>
+
+    </div>
+
   </section>
-  <section class="about-strip" id="about"><div><p class="eyebrow">A LITTLE FUN GOES A LONG WAY</p><h2>Small games.<br>Big breaks.</h2></div><p>PlayViral is a growing collection of simple, free browser games. No app install, no account and no download. Pick a challenge and play.</p></section>
+
+
+  <!-- ABOUT SECTION -->
+  <section class="about-strip" id="about">
+
+    <div>
+      <p class="eyebrow">A LITTLE FUN GOES A LONG WAY</p>
+
+      <h2>
+        Small games.<br>
+        Big breaks.
+      </h2>
+    </div>
+
+    <p>
+      PlayViral is a growing collection of simple, free browser games.
+      No app install, no account and no download.
+      Pick a challenge and play.
+    </p>
+
+  </section>
+
 </main>
-<footer><a class="brand" href="./"><span class="brand-mark">▶</span> PlayViral</a><div><a href="about.html">About</a><a href="contact.html">Contact</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div><small>© <span id="year"></span> PlayViral. Built for fun.</small></footer>
-</body></html>
+
+
+<!-- FOOTER -->
+<footer>
+
+  <a class="brand" href="./">
+    <span class="brand-mark">▶</span> PlayViral
+  </a>
+
+  <div>
+    <a href="./about.html">About</a>
+    <a href="./contact.html">Contact</a>
+    <a href="./privacy.html">Privacy</a>
+    <a href="./terms.html">Terms</a>
+  </div>
+
+  <small>
+    © <span id="year"></span> PlayViral. Built for fun.
+  </small>
+
+</footer>
+
+
+<!-- AUTOMATIC COPYRIGHT YEAR -->
+<script>
+  document.getElementById("year").textContent =
+    new Date().getFullYear();
+</script>
+
+</body>
+</html>
