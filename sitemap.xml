@@ -1,49 +1,13 @@
-
-<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-  <url>
-    <loc>https://viral-mini-games.rathoreking2016.workers.dev/</loc>
-  </url>
-
-  <url>
-    <loc>https://viral-mini-games.rathoreking2016.workers.dev/reaction-test.html</loc>
-  </url>
-
-  <url>
-    <loc>https://viral-mini-games.rathoreking2016.workers.dev/number-merge.html</loc>
-  </url>
-
-  <url>
-    <loc>https://viral-mini-games.rathoreking2016.workers.dev/ball-sort.html</loc>
-  </url>
-
-  <url>
-    <loc>https://viral-mini-games.rathoreking2016.workers.dev/block-puzzle.html</loc>
-  </url>
-
-  <url>
-    <loc>https://viral-mini-games.rathoreking2016.workers.dev/endless-runner.html</loc>
-  </url>
-
-  <url>
-    <loc>https://viral-mini-games.rathoreking2016.workers.dev/about.html</loc>
-  </url>
-
-  <url>
-    <loc>https://viral-mini-games.rathoreking2016.workers.dev/contact.html</loc>
-  </url>
-
-  <url>
-    <loc>https://viral-mini-games.rathoreking2016.workers.dev/privacy.html</loc>
-  </url>
-
-  <url>
-    <loc>https://viral-mini-games.rathoreking2016.workers.dev/terms.html</loc>
-  </url>
-
-  <url>
-    <loc>https://viral-mini-games.rathoreking2016.workers.dev/disclaimer.html</loc>
-  </url>
-
+  <url><loc>https://viral-mini-games.rathoreking2016.workers.dev/</loc></url>
+  <url><loc>https://viral-mini-games.rathoreking2016.workers.dev/reaction-test.html</loc></url>
+  <url><loc>https://viral-mini-games.rathoreking2016.workers.dev/number-merge.html</loc></url>
+  <url><loc>https://viral-mini-games.rathoreking2016.workers.dev/ball-sort.html</loc></url>
+  <url><loc>https://viral-mini-games.rathoreking2016.workers.dev/block-puzzle.html</loc></url>
+  <url><loc>https://viral-mini-games.rathoreking2016.workers.dev/endless-runner.html</loc></url>
+  <url><loc>https://viral-mini-games.rathoreking2016.workers.dev/about.html</loc></url>
+  <url><loc>https://viral-mini-games.rathoreking2016.workers.dev/contact.html</loc></url>
+  <url><loc>https://viral-mini-games.rathoreking2016.workers.dev/privacy.html</loc></url>
+  <url><loc>https://viral-mini-games.rathoreking2016.workers.dev/terms.html</loc></url>
+  <url><loc>https://viral-mini-games.rathoreking2016.workers.dev/disclaimer.html</loc></url>
 </urlset>
