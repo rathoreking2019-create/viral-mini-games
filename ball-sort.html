@@ -5,83 +5,226 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Ball Sort Puzzle | PlayViral</title>
-  <meta name="description" content="Play a free ball sort puzzle online. Sort colored balls into matching tubes.">
+  <title>Ball Sort Puzzle Online – Free Color Sorting Game | PlayViral</title>
+
+  <meta name="description" content="Play Ball Sort Puzzle free online. Sort colorful balls into matching tubes, plan your moves, use empty spaces wisely and challenge your logic skills.">
+
   <meta name="robots" content="index,follow">
 
   <link rel="canonical" href="https://viral-mini-games.rathoreking2016.workers.dev/ball-sort.html">
-  <link rel="stylesheet" href="./style.css">
 
+  <meta property="og:title" content="Ball Sort Puzzle Online | PlayViral">
+  <meta property="og:description" content="Sort colorful balls into matching tubes in this free browser puzzle game.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://viral-mini-games.rathoreking2016.workers.dev/ball-sort.html">
+
+  <link rel="stylesheet" href="./style.css">
   <script defer src="./game.js"></script>
 </head>
 
 <body>
-  <header class="site-header">
-    <a class="brand" href="./">
-      <span class="brand-mark">▶</span> PlayViral
-    </a>
 
-    <nav>
-      <a href="./#games">All games</a>
-      <a href="./#about">About</a>
-    </nav>
-  </header>
+<header class="site-header">
+  <a class="brand" href="/" aria-label="PlayViral Home">
+    <span class="brand-mark">▶</span> PlayViral
+  </a>
 
-  <main class="game-page">
-    <a class="back-link" href="./#games">← All games</a>
+  <nav aria-label="Main navigation">
+    <a href="/#games">All games</a>
+    <a href="/about.html">About</a>
+    <a href="/contact.html">Contact</a>
+  </nav>
+</header>
 
-    <div class="game-head">
-      <p class="eyebrow">FREE BROWSER GAME</p>
-      <h1>Ball Sort Puzzle</h1>
-      <p>Move the colored balls until every tube contains one color.</p>
+<main class="game-page">
+
+  <a class="back-link" href="/#games">← All games</a>
+
+  <div class="game-head">
+    <p class="eyebrow">FREE ONLINE LOGIC PUZZLE</p>
+
+    <h1>Ball Sort Puzzle</h1>
+
+    <p>
+      Sort colorful balls into matching tubes. Think ahead,
+      organize every color and complete the puzzle one move at a time.
+    </p>
+  </div>
+
+  <!-- GAME AREA: Existing game functionality preserved -->
+  <section class="game-shell" data-game="ball-sort">
+
+    <div class="game-toolbar">
+      <span class="score-pill" id="score-label">Score: 0</span>
+
+      <button class="control-btn secondary" id="restart">
+        Restart
+      </button>
     </div>
 
-    <section class="game-shell" data-game="ball-sort">
-      <div class="game-toolbar">
-        <span class="score-pill" id="score-label">Score: 0</span>
-        <button class="control-btn secondary" id="restart">Restart</button>
-      </div>
+    <div class="game-area" id="game-area"></div>
 
-      <div class="game-area" id="game-area"></div>
-      <div class="game-note" id="game-note">Ready when you are.</div>
-    </section>
+    <div class="game-note" id="game-note">
+      Ready when you are.
+    </div>
 
-    <p class="instructions">
-      Tap one tube to pick its top ball, then tap another tube to move it.
-      You can only place a ball on an empty tube or a matching color, with available space.
-    </p>
-  </main>
-
-  <section class="content-section">
-    <h2>How to play Ball Sort Puzzle</h2>
-    <p>
-      Sort every color into its own tube in this free logic puzzle.
-      Move one top ball at a time and use empty tubes to plan your sequence.
-    </p>
-
-    <h2>Tips</h2>
-    <p>
-      Use the empty tube as temporary storage. Avoid trapping a color beneath a different ball.
-    </p>
   </section>
 
-  <footer>
-    <a class="brand" href="./">
-      <span class="brand-mark">▶</span> PlayViral
-    </a>
+  <section class="content-section">
 
-    <div>
-      <a href="./about.html">About</a>
-      <a href="./contact.html">Contact</a>
-      <a href="./privacy.html">Privacy</a>
-      <a href="./terms.html">Terms</a>
-    </div>
+    <h2>How to Play Ball Sort Puzzle</h2>
 
-    <small>© <span id="year"></span> PlayViral</small>
-  </footer>
+    <p>
+      Ball Sort Puzzle is a color-organizing logic game. Your goal is
+      to arrange the balls so that each tube contains balls of only
+      one color. You need to think carefully about the order of your
+      moves because moving one ball can affect the next few moves.
+    </p>
 
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
+    <h3>Game Instructions</h3>
+
+    <ol>
+      <li>Select a tube containing balls to pick up its top ball.</li>
+      <li>Select another tube to move the ball there.</li>
+      <li>You can move a ball into an empty tube.</li>
+      <li>You can also place a ball on a matching color if the tube has space.</li>
+      <li>Continue until every color is organized into its own tube.</li>
+    </ol>
+
+    <h2>Ball Sort Puzzle Rules</h2>
+
+    <p>
+      The puzzle follows a simple set of sorting rules. You can move
+      only the top ball from a tube. A ball can be placed in an empty
+      tube or on top of a ball of the same color, provided there is
+      enough room. Planning your moves is important because a tube
+      can hold only a limited number of balls.
+    </p>
+
+    <h2>5 Tips to Solve Ball Sort Puzzles</h2>
+
+    <h3>1. Look at all the tubes first</h3>
+    <p>
+      Before making your first move, check which colors are already
+      grouped together and which colors are blocking other balls.
+    </p>
+
+    <h3>2. Use empty tubes carefully</h3>
+    <p>
+      Empty tubes give you temporary space to move balls around.
+      Avoid filling them without thinking about your next moves.
+    </p>
+
+    <h3>3. Complete matching colors when possible</h3>
+    <p>
+      Moving matching balls together can make the remaining puzzle
+      easier to manage and reduce unnecessary moves.
+    </p>
+
+    <h3>4. Avoid blocking important colors</h3>
+    <p>
+      A ball placed above a different color can prevent you from
+      accessing the balls underneath. Think about what each move
+      will reveal or hide.
+    </p>
+
+    <h3>5. Plan more than one move ahead</h3>
+    <p>
+      Instead of moving balls randomly, consider how a move will
+      affect the available space in the other tubes.
+    </p>
+
+    <h2>Why Play Ball Sort Puzzle?</h2>
+
+    <p>
+      Ball Sort Puzzle offers a simple way to enjoy a short
+      brain-teasing break. It encourages players to organize colors,
+      recognize patterns and plan a sequence of moves. The rules are
+      easy to understand, but solving a puzzle can require patience
+      and careful thinking.
+    </p>
+
+    <ul>
+      <li>Play directly in your web browser.</li>
+      <li>No game download is required.</li>
+      <li>Simple color-based puzzle mechanics.</li>
+      <li>Suitable for quick breaks and casual gameplay.</li>
+      <li>Restart the game whenever you want to try again.</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <h3>What is the objective of Ball Sort Puzzle?</h3>
+    <p>
+      The objective is to organize the balls so that each tube
+      contains balls of only one color.
+    </p>
+
+    <h3>How do I move a ball?</h3>
+    <p>
+      Select the tube containing the ball you want to move, then
+      select a destination tube that can accept it.
+    </p>
+
+    <h3>Can I move a ball into an empty tube?</h3>
+    <p>
+      Yes. An empty tube can be used as temporary storage while
+      organizing the colors.
+    </p>
+
+    <h3>Can I place different colors in the same tube?</h3>
+    <p>
+      You can place a ball on another ball only when the colors
+      match, or move it into an empty tube, subject to available space.
+    </p>
+
+    <h3>What should I do if I make a mistake?</h3>
+    <p>
+      Use the Restart button to start the game again.
+    </p>
+
+    <h3>Is Ball Sort Puzzle free to play?</h3>
+    <p>
+      Yes. You can play this PlayViral browser game for free without
+      downloading a separate game application.
+    </p>
+
+    <h2>Explore More Free Mini Games</h2>
+
+    <p>
+      Looking for another challenge? Try more free games on PlayViral:
+    </p>
+
+    <ul>
+      <li><a href="/reaction-test.html">Reaction Test</a> – Test your reflexes.</li>
+      <li><a href="/number-merge.html">Number Merge</a> – Combine number tiles.</li>
+      <li><a href="/block-puzzle.html">Block Puzzle</a> – Fit blocks and clear lines.</li>
+      <li><a href="/endless-runner.html">Endless Runner</a> – Jump and dodge obstacles.</li>
+    </ul>
+
+  </section>
+
+</main>
+
+<footer>
+  <a class="brand" href="/">
+    <span class="brand-mark">▶</span> PlayViral
+  </a>
+
+  <div>
+    <a href="/about.html">About</a>
+    <a href="/contact.html">Contact</a>
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/terms.html">Terms</a>
+    <a href="/disclaimer.html">Disclaimer</a>
+  </div>
+
+  <small>© <span id="year"></span> PlayViral. Built for fun.</small>
+</footer>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
 </body>
 </html>
