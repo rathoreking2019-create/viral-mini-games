@@ -211,273 +211,334 @@ function merge() {
 
   setNote("Use arrow keys, WASD or swipe to move. Merge matching numbers to reach 2048.");
 }
- function balls(){const colors=["red","blue","green","yellow","purple","orange"];let tubes=[];for(let i=0;i<5;i++)tubes.push([]);let all=[];colors.slice(0,4).forEach(c=>{for(let j=0;j<4;j++)all.push(c)});all.sort(()=>Math.random()-.5);for(let i=0;i<4;i++)tubes[i]=all.slice(i*4,i*4+4);let selected=-1,moves=0;const draw=()=>{area.innerHTML="";const row=document.createElement("div");row.className="tubes";tubes.forEach((t,i)=>{const el=document.createElement("button");el.className="tube";el.setAttribute("aria-label","Tube "+(i+1));t.forEach(c=>{const ball=document.createElement("span");ball.className="ball "+c;el.append(ball);});el.addEventListener("click",()=>tap(i));row.append(el);});area.append(row);setScore(moves);};const tap=i=>{if(selected<0){if(tubes[i].length)selected=i;}else if(selected===i)selected=-1;else{let from=tubes[selected],to=tubes[i],c=from[from.length-1];if(c&&to.length<4&&(!to.length||to[to.length-1]===c)){to.push(from.pop());moves++;}selected=-1;}draw();if(tubes.every(t=>!t.length||t.every(c=>c===t[0])&&t.length===4))setNote("Puzzle complete! Great sorting.");};draw();setNote("Tap a tube, then tap another tube. One empty tube helps.");}
+ 
+function balls() {
+  const palette = ["red", "blue", "green", "yellow", "purple", "orange"];
+  const STORAGE_KEY = "playviral_ball_sort_progress";
+  const CAPACITY = 4;
 
-function blocks() {
-  const SIZE = 8;
+  const levelLabel = document.getElementById("level-label");
+  const starsLabel = document.getElementById("stars-label");
+  const coinsLabel = document.getElementById("coins-label");
+  const progressText = document.getElementById("level-progress-text");
+  const progressFill = document.getElementById("level-progress-fill");
+  const progressBar = document.getElementById("level-progress");
+  const levelMessage = document.getElementById("level-message");
+  const nextButton = document.getElementById("next-level");
 
-  let grid = Array(SIZE * SIZE).fill(0);
-  let score = 0;
-  let level = 1;
-  let piece = null;
-  let timer = null;
-  let gameOver = false;
+  let saved = { level: 1, stars: 0, coins: 0 };
 
-  const shapes = [
-    [[1, 1, 1, 1]],
-    [[1, 1], [1, 1]],
-    [[1, 1, 1], [0, 1, 0]],
-    [[1, 1, 1], [1, 0, 0]],
-    [[1, 1, 1], [0, 0, 1]],
-    [[1, 1, 0], [0, 1, 1]],
-    [[0, 1, 1], [1, 1, 0]],
-    [[1, 1, 1], [1, 0, 1]]
-  ];
-
-  const wrap = document.createElement("div");
-  wrap.className = "falling-game";
-
-  const board = document.createElement("div");
-  board.className = "block-board";
-
-  const cells = [];
-
-  for (let i = 0; i < SIZE * SIZE; i++) {
-    const cell = document.createElement("div");
-    cell.className = "block-cell";
-    cells.push(cell);
-    board.append(cell);
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    saved.level = Math.max(1, Number(data.level) || 1);
+    saved.stars = Math.max(0, Number(data.stars) || 0);
+    saved.coins = Math.max(0, Number(data.coins) || 0);
+  } catch (error) {
+    console.warn("Ball Sort progress could not be loaded.", error);
   }
 
-  const controls = document.createElement("div");
-  controls.className = "fall-controls";
+  let level = saved.level;
+  let totalStars = saved.stars;
+  let totalCoins = saved.coins;
+  let tubes = [];
+  let selected = -1;
+  let moves = 0;
+  let completed = false;
 
-  const makeButton = (label, action, title) => {
-    const button = document.createElement("button");
-    button.className = "fall-control";
-    button.textContent = label;
-    button.setAttribute("aria-label", title);
-    button.addEventListener("click", action);
-    controls.append(button);
-    return button;
+  const colorCount = () => Math.min(
+    palette.length,
+    2 + Math.floor((level - 1) / 3)
+  );
+
+  const saveProgress = () => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        level,
+        stars: totalStars,
+        coins: totalCoins
+      }));
+    } catch (error) {
+      console.warn("Ball Sort progress could not be saved.", error);
+    }
   };
 
-  wrap.append(board, controls);
-  area.append(wrap);
+  const updateDashboard = () => {
+    if (levelLabel) levelLabel.textContent = "Level " + level;
+    if (starsLabel) starsLabel.textContent = "⭐ " + totalStars;
+    if (coinsLabel) coinsLabel.textContent = "🪙 " + totalCoins;
 
-  const rotateShape = shape =>
-    shape[0].map((_, i) =>
-      shape.map(row => row[i]).reverse()
-    );
+    const count = colorCount();
+    const sorted = tubes.filter(tube =>
+      tube.length === CAPACITY &&
+      tube.every(color => color === tube[0])
+    ).length;
 
-  const valid = (shape, x, y) => {
-    return shape.every((row, dy) =>
-      row.every((value, dx) => {
-        if (!value) return true;
+    const percent = Math.round((sorted / count) * 100);
 
-        const nx = x + dx;
-        const ny = y + dy;
+    if (progressText) {
+      progressText.textContent = sorted + " / " + count + " tubes sorted";
+    }
 
-        return (
-          nx >= 0 &&
-          nx < SIZE &&
-          ny < SIZE &&
-          !grid[ny * SIZE + nx]
-        );
-      })
-    );
+    if (progressFill) {
+      progressFill.style.width = percent + "%";
+    }
+
+    if (progressBar) {
+      progressBar.setAttribute("aria-valuenow", String(percent));
+    }
+
+    if (nextButton) {
+      nextButton.hidden = !completed;
+      nextButton.disabled = !completed;
+    }
+  };
+
+  const createPuzzle = () => {
+    const count = colorCount();
+
+    // Begin with a solved puzzle.
+    const puzzle = [];
+
+    for (let i = 0; i < count; i++) {
+      puzzle.push(Array(CAPACITY).fill(palette[i]));
+    }
+
+    puzzle.push([]);
+
+    // Reverse legal moves to generate a solvable scramble.
+    let previousSource = -1;
+    let previousDestination = -1;
+    const scrambleMoves = Math.min(70, 10 + level * 3);
+    let successfulMoves = 0;
+    let attempts = 0;
+
+    while (successfulMoves < scrambleMoves && attempts < scrambleMoves * 30) {
+      attempts++;
+
+      const sources = puzzle
+        .map((tube, index) => tube.length ? index : -1)
+        .filter(index => index !== -1);
+
+      const source = sources[Math.floor(Math.random() * sources.length)];
+
+      const destinations = puzzle
+        .map((tube, index) => {
+          if (index === source) return -1;
+          if (tube.length >= CAPACITY) return -1;
+          if (index === previousSource) return -1;
+
+          const top = tube[tube.length - 1];
+          const ball = puzzle[source][puzzle[source].length - 1];
+
+          if (top && top !== ball) return -1;
+
+          return index;
+        })
+        .filter(index => index !== -1);
+
+      if (!destinations.length) continue;
+
+      const destination =
+        destinations[Math.floor(Math.random() * destinations.length)];
+
+      // Move one ball in reverse direction.
+      const ball = puzzle[source].pop();
+      puzzle[destination].push(ball);
+
+      previousSource = source;
+      previousDestination = destination;
+      successfulMoves++;
+    }
+
+    return puzzle;
   };
 
   const render = () => {
-    const active = new Set();
+    area.innerHTML = "";
 
-    if (piece) {
-      piece.shape.forEach((row, dy) =>
-        row.forEach((value, dx) => {
-          if (value) {
-            const x = piece.x + dx;
-            const y = piece.y + dy;
+    const board = document.createElement("div");
+    board.className = "ball-board";
 
-            if (x >= 0 && x < SIZE && y >= 0 && y < SIZE) {
-              active.add(y * SIZE + x);
-            }
-          }
-        })
-      );
-    }
+    tubes.forEach((tube, index) => {
+      const tubeElement = document.createElement("button");
+      tubeElement.type = "button";
+      tubeElement.className = "tube";
+      tubeElement.setAttribute("aria-label", "Tube " + (index + 1));
 
-    cells.forEach((cell, i) => {
-      cell.className = "block-cell";
+      if (selected === index) {
+        tubeElement.classList.add("selected");
+      }
 
-      if (grid[i]) cell.classList.add("filled");
-      if (active.has(i)) cell.classList.add("falling");
+      const ballSlots = [];
+
+      for (let i = 0; i < CAPACITY; i++) {
+        const ball = document.createElement("span");
+        ball.className = "ball";
+
+        const color = tube[i];
+
+        if (color) {
+          ball.classList.add("ball-" + color);
+        }
+
+        ballSlots.push(ball);
+      }
+
+      // Display balls from bottom to top.
+      ballSlots.forEach(slot => tubeElement.append(slot));
+
+      tubeElement.addEventListener("click", () => handleTubeClick(index));
+
+      board.append(tubeElement);
     });
 
-    setScore(score);
+    area.append(board);
+    updateDashboard();
   };
 
-  const spawn = () => {
-    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+  const isTubeComplete = tube =>
+    tube.length === CAPACITY &&
+    tube.every(color => color === tube[0]);
 
-    piece = {
-      shape: shape.map(row => row.slice()),
-      x: Math.floor((SIZE - shape[0].length) / 2),
-      y: 0
-    };
+  const isGameComplete = () =>
+    tubes.every(tube => tube.length === 0 || isTubeComplete(tube));
 
-    if (!valid(piece.shape, piece.x, piece.y)) {
-      endGame();
+  const handleTubeClick = index => {
+    if (completed) return;
+
+    const tube = tubes[index];
+
+    if (selected === -1) {
+      if (!tube.length) {
+        setNote("Select a tube containing a ball first.");
+        return;
+      }
+
+      selected = index;
+      render();
+      setNote("Now select a tube to move the top ball.");
       return;
     }
 
+    if (selected === index) {
+      selected = -1;
+      render();
+      setNote("Selection cancelled.");
+      return;
+    }
+
+    const source = tubes[selected];
+    const destination = tubes[index];
+
+    if (!source.length) {
+      selected = -1;
+      render();
+      return;
+    }
+
+    const movingBall = source[source.length - 1];
+    const destinationTop = destination[destination.length - 1];
+
+    if (destination.length >= CAPACITY) {
+      setNote("This tube is full. Choose another tube.");
+      return;
+    }
+
+    if (destination.length && destinationTop !== movingBall) {
+      setNote("You can only place a ball on the same color.");
+      return;
+    }
+
+    destination.push(source.pop());
+    moves++;
+    selected = -1;
+
     render();
+    setScore(moves);
+
+    if (isGameComplete()) {
+      completeLevel();
+    } else {
+      setNote("Good move! Keep sorting the colors.");
+    }
   };
 
-  const lockPiece = () => {
-    piece.shape.forEach((row, dy) =>
-      row.forEach((value, dx) => {
-        if (value) {
-          const x = piece.x + dx;
-          const y = piece.y + dy;
+  const completeLevel = () => {
+    if (completed) return;
 
-          if (y >= 0 && y < SIZE) {
-            grid[y * SIZE + x] = 1;
-          }
-        }
-      })
+    completed = true;
+
+    let earnedStars = 1;
+
+    if (moves <= colorCount() * 5) {
+      earnedStars = 3;
+    } else if (moves <= colorCount() * 9) {
+      earnedStars = 2;
+    }
+
+    const earnedCoins = 10 + level * 2;
+
+    totalStars += earnedStars;
+    totalCoins += earnedCoins;
+
+    saveProgress();
+    updateDashboard();
+
+    if (levelMessage) {
+      levelMessage.textContent =
+        "Level completed! You earned " +
+        earnedStars + " stars and " +
+        earnedCoins + " coins.";
+    }
+
+    setNote(
+      "Level " + level + " completed! ⭐ " +
+      earnedStars + " stars earned. 🪙 " +
+      earnedCoins + " coins earned."
     );
 
-    piece = null;
-
-    // Clear completed horizontal rows.
-    const remaining = [];
-
-    for (let y = 0; y < SIZE; y++) {
-      const row = grid.slice(y * SIZE, (y + 1) * SIZE);
-
-      if (!row.every(Boolean)) {
-        remaining.push(row);
-      } else {
-        score += 100 * level;
-      }
-    }
-
-    while (remaining.length < SIZE) {
-      remaining.unshift(Array(SIZE).fill(0));
-    }
-
-    grid = remaining.flat();
-
-    level = Math.floor(score / 500) + 1;
-
-    if (!gameOver) spawn();
+    setScore(moves);
   };
 
-  const tick = () => {
-    if (gameOver || !piece) return;
+  const startLevel = () => {
+    selected = -1;
+    moves = 0;
+    completed = false;
 
-    if (valid(piece.shape, piece.x, piece.y + 1)) {
-      piece.y++;
-      render();
-    } else {
-      lockPiece();
+    tubes = createPuzzle();
+
+    if (levelMessage) {
+      levelMessage.textContent = "Sort all colors to complete this level.";
     }
 
-    if (!gameOver) scheduleTick();
-  };
-
-  const scheduleTick = () => {
-    clearTimeout(timer);
-
-    const speed = Math.max(100, 550 - (level - 1) * 45);
-    timer = setTimeout(tick, speed);
-  };
-
-  const move = dx => {
-    if (gameOver || !piece) return;
-
-    if (valid(piece.shape, piece.x + dx, piece.y)) {
-      piece.x += dx;
-      render();
-    }
-  };
-
-  const rotate = () => {
-    if (gameOver || !piece) return;
-
-    const rotated = rotateShape(piece.shape);
-
-    if (valid(rotated, piece.x, piece.y)) {
-      piece.shape = rotated;
-      render();
-    }
-  };
-
-  const softDrop = () => {
-    if (gameOver || !piece) return;
-
-    if (valid(piece.shape, piece.x, piece.y + 1)) {
-      piece.y++;
-      score += 1;
-      render();
-    } else {
-      lockPiece();
-    }
-  };
-
-  const hardDrop = () => {
-    if (gameOver || !piece) return;
-
-    while (valid(piece.shape, piece.x, piece.y + 1)) {
-      piece.y++;
-      score += 2;
+    if (nextButton) {
+      nextButton.hidden = true;
+      nextButton.disabled = true;
     }
 
+    setScore(0);
     render();
-    lockPiece();
-
-    if (!gameOver) scheduleTick();
+    setNote("Sort the balls by color. Only matching colors can be stacked.");
   };
 
-  const endGame = () => {
-    gameOver = true;
-    clearTimeout(timer);
-    piece = null;
-    render();
+  const nextLevelHandler = () => {
+    if (!completed) return;
 
-    setNote("Game over! Final score: " + score + ". Press Restart to play again.");
+    level++;
+    saveProgress();
+    startLevel();
   };
 
-  const keyHandler = e => {
-    if (gameOver) return;
+  if (nextButton) {
+    nextButton.addEventListener("click", nextLevelHandler);
+  }
 
-    if (["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", " "].includes(e.key)) {
-      e.preventDefault();
-    }
-
-    if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") move(-1);
-    if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") move(1);
-    if (e.key === "ArrowDown" || e.key.toLowerCase() === "s") softDrop();
-    if (e.key === "ArrowUp" || e.key.toLowerCase() === "w") rotate();
-    if (e.code === "Space") hardDrop();
-  };
-
-  window.addEventListener("keydown", keyHandler);
-
-  makeButton("←", () => move(-1), "Move left");
-  makeButton("↻", rotate, "Rotate piece");
-  makeButton("→", () => move(1), "Move right");
-  makeButton("↓", softDrop, "Move down");
-  makeButton("⬇", hardDrop, "Drop instantly");
-
-  spawn();
-  scheduleTick();
-
-  setNote("Move: ← → | Rotate: ↑ | Drop: ↓ | Hard drop: Space");
+  startLevel();
 
   cleanup = () => {
-    clearTimeout(timer);
-    window.removeEventListener("keydown", keyHandler);
+    if (nextButton) {
+      nextButton.removeEventListener("click", nextLevelHandler);
+    }
   };
 }
  function runner(){const canvas=document.createElement("canvas");canvas.width=680;canvas.height=300;canvas.className="runner-canvas";area.append(canvas);const ctx=canvas.getContext("2d");let x=80,y=220,vy=0,obs=[],score=0,alive=true,frame=0,raf;const jump=()=>{if(y>=220&&alive)vy=-13;};const key=e=>{if(e.code==="Space"){e.preventDefault();jump();}};window.addEventListener("keydown",key);canvas.addEventListener("pointerdown",jump);function loop(){ctx.clearRect(0,0,680,300);ctx.fillStyle="#d8e8f8";ctx.fillRect(0,250,680,50);ctx.fillStyle="#283b59";ctx.fillRect(0,250,680,3);vy+=.65;y+=vy;if(y>220){y=220;vy=0;}if(frame%85===0)obs.push({x:690,w:24,h:35+Math.random()*25});obs.forEach(o=>o.x-=5);obs=obs.filter(o=>o.x>-30);ctx.fillStyle="#7057f5";ctx.fillRect(x,y,30,30);ctx.fillStyle="#f46b9b";obs.forEach(o=>ctx.fillRect(o.x,250-o.h,o.w,o.h));if(obs.some(o=>x+27>o.x&&x<o.x+o.w&&y+27>250-o.h)){alive=false;}ctx.fillStyle="#17172a";ctx.font="bold 18px sans-serif";ctx.fillText("Distance: "+score,20,30);if(alive){score++;frame++;setScore(Math.floor(score/5));raf=requestAnimationFrame(loop);}else{ctx.fillStyle="#17172a";ctx.font="bold 30px sans-serif";ctx.fillText("Game over!",260,135);setNote("You ran "+Math.floor(score/5)+" metres. Press Restart to run again.");}}loop();cleanup=()=>{cancelAnimationFrame(raf);window.removeEventListener("keydown",key);};setNote("Tap, click or press Space to jump.");}
